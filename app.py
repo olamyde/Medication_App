@@ -4,7 +4,7 @@ import pandas as pd
 app = Flask(__name__)
 
 # Read the Excel file into a DataFrame
-df = pd.read_excel('/mnt/data/Medication Remedies and Generic Names.xlsx')
+df = pd.read_excel('/mnt/data/Medication_Remedies_and_Generic_Names.xlsx')
 
 # Search function
 def search_medications(query):
