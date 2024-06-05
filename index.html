@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medication Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Medication Search</h1>
+        <input type="text" id="searchQuery" placeholder="Enter medication name or remedy...">
+        <button onclick="searchMedications()">Search</button>
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        async function searchMedications() {
+            const query = document.getElementById('searchQuery').value;
+            const response = await fetch(`/search?q=${query}`);
+            const results = await response.json();
+
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            if (results.length > 0) {
+                results.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.classList.add('result');
+                    resultDiv.innerHTML = `<strong>${result.Medication}</strong>: ${result.GenericName}`;
+                    resultsContainer.appendChild(resultDiv);
+                });
+            } else {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
