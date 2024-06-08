@@ -4,13 +4,13 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         SSH_CREDENTIALS = credentials('ssh-credentials')
-        GITHUB_CREDENTIALS = credentials('github_login')
+        GITHUB_CREDENTIALS = credentials('github-ssh-key')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'git@github.com:olamyde/Medication_App.git', credentialsId: 'github_login'
+                git url: 'git@github.com:olamyde/Medication_App.git', credentialsId: 'github-ssh-key'
             }
         }
 
