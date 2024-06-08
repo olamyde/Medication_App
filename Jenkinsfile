@@ -35,7 +35,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_CREDENTIALS']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
+                    ssh -o StrictHostKeyChecking=no $olamyde@$S127.0.0.1 << EOF
                     docker pull olamyde/medication_search:latest
                     docker stop medication_search || true
                     docker rm medication_search || true
