@@ -17,7 +17,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    docker.withRegistry('', 'dockerhub-credentials') {
                     docker.build("olamyde/medication_search:latest")
+                    }
                 }
             }
         }
