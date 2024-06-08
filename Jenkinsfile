@@ -9,14 +9,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/your-username/your-repo.git'
+                git 'git@github.com:olamyde/Medication_App.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("your-dockerhub-username/medication-search:latest")
+                    docker.build("olamyde/medication_search:latest")
                 }
             }
         }
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'DOCKERHUB_CREDENTIALS') {
-                        docker.image("your-dockerhub-username/medication-search:latest").push()
+                        docker.image("olamyde/medication_search:latest").push()
                     }
                 }
             }
@@ -36,10 +36,10 @@ pipeline {
                 sshagent(credentials: ['SSH_CREDENTIALS']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
-                    docker pull your-dockerhub-username/medication-search:latest
-                    docker stop medication-search || true
-                    docker rm medication-search || true
-                    docker run -d -p 80:5000 --name medication-search your-dockerhub-username/medication-search:latest
+                    docker pull olamyde/medication_search:latest
+                    docker stop medication_search || true
+                    docker rm medication_search || true
+                    docker run -d -p 80:5000 --name medication_search olamyde/medication_search:latest
                     EOF
                     '''
                 }
