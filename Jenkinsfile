@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'git@github.com:olamyde/Medication_App.git'
+                git url: 'git@github.com:olamyde/Medication_App.git', credentialsId: 'github_login'
             }
         }
 
