@@ -56,6 +56,7 @@ pipeline {
                 script {
                     sh """
                         docker run -d -p 80:5000 --name medication_search ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
+                        docker ps |grep ${env.APPLICATION_NAME}
                     """
                 }
             }
