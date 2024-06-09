@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import pandas as pd
+import os
 
 app = Flask(__name__)
 
@@ -18,6 +19,10 @@ def search():
         results = search_medications(query)
         return jsonify(results)
     return jsonify([])
+
+@app.route('/', methods=['GET'])
+def home():
+    return send_from_directory(os.getcwd(), 'index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
