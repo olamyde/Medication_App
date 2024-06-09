@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+# Copy the Excel file into the container
+COPY Medication_Remedies_and_Generic_Names.xlsx /app/Medication_Remedies_and_Generic_Names.xlsx
+
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
