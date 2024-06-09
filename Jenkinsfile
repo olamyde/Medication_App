@@ -55,7 +55,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker run -itd -p 5000:80 --name medication_search ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
+                        docker run -itd -p 5001:5000 --name medication_search ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
                         docker ps |grep ${env.APPLICATION_NAME}
                     """
                 }
