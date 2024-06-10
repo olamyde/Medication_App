@@ -7,6 +7,9 @@ app = Flask(__name__)
 # Read the Excel file into a DataFrame
 df = pd.read_excel('/app/Medication_Remedies_and_Generic_Names.xlsx')
 
+# Print column names for debugging
+print(df.columns)
+
 # Search function
 def search_medications(query):
     results = df[df.apply(lambda row: row.astype(str).str.contains(query, case=False).any(), axis=1)]
