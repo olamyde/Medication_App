@@ -13,6 +13,7 @@ print(df.columns)
 # Search function
 def search_medications(query):
     results = df[df.apply(lambda row: row.astype(str).str.contains(query, case=False).any(), axis=1)]
+    print(f"Search results: {results}")  # Debug print
     return results.to_dict(orient='records')
 
 @app.route('/search', methods=['GET'])
