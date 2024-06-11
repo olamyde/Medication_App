@@ -9,6 +9,7 @@ df = pd.read_excel('/app/Medication_Remedies_and_Generic_Names.xlsx')
 
 # Print column names for debugging
 print(df.columns)
+print(df.head())  # Debug print to show the first few rows
 
 # Search function
 def search_medications(query):
