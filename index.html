@@ -60,32 +60,32 @@
 
     <script>
         async function searchMedications() {
-    const query = document.getElementById('searchQuery').value;
-    try {
-        const response = await fetch(`/search?q=${query}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const results = await response.json();
-        console.log('Results:', results);  // Debug print
+            const query = document.getElementById('searchQuery').value;
+            try {
+                const response = await fetch(`/search?q=${query}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const results = await response.json();
+                console.log('Results:', results);  // Debug print
 
-        const resultsContainer = document.getElementById('results');
-        resultsContainer.innerHTML = '';
-        if (results.length > 0) {
-            results.forEach(result => {
-                const resultDiv = document.createElement('div');
-                resultDiv.classList.add('result');
-                resultDiv.innerHTML = `<strong>${result.Medication || ''}</strong>: ${result.GenericName || ''}`;
-                resultsContainer.appendChild(resultDiv);
-            });
-        } else {
-            resultsContainer.innerHTML = '<p>No results found.</p>';
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = '';
+                if (results.length > 0) {
+                    results.forEach(result => {
+                        const resultDiv = document.createElement('div');
+                        resultDiv.classList.add('result');
+                        resultDiv.innerHTML = `<strong>${result.Medication || ''}</strong>: ${result.GenericName || ''}`;
+                        resultsContainer.appendChild(resultDiv);
+                    });
+                } else {
+                    resultsContainer.innerHTML = '<p>No results found.</p>';
+                }
+            } catch (error) {
+                console.error('Error during fetch:', error);
+                document.getElementById('results').innerHTML = '<p>Error fetching results. Please try again later.</p>';
+            }
         }
-    } catch (error) {
-        console.error('Error during fetch:', error);
-        document.getElementById('results').innerHTML = '<p>Error fetching results. Please try again later.</p>';
-    }
-}
     </script>
 </body>
 </html>
