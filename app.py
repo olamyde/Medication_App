@@ -18,8 +18,10 @@ def search_medications(query):
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('q')
+    print(f"Query received: {query}")  # Debug print
     if query:
         results = search_medications(query)
+        print(f"Results found: {results}")  # Debug print
         return jsonify(results)
     return jsonify([])
 
