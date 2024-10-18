@@ -3,7 +3,7 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = 'docker-login'
         SSH_CREDENTIALS = 'ssh-credentials'
-        GITHUB_CREDENTIALS = 'github-login'
+        GITHUB_CREDENTIALS = 'github-ssh'
         DOCKER_HUB_USERNAME = "olamyde"
         APPLICATION_NAME = "medication_search"
         APPLICATION_TAG = "latest"
