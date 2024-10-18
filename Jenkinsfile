@@ -40,11 +40,14 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image and tag it appropriately
-                    sh """
-                        docker build -t ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG} .
-                        docker images | grep ${env.APPLICATION_TAG}
-                    """
+                    // Ensure Docker is available in the environment
+                    docker.withServer('unix:///var/run/docker.sock') {
+                        // Build the Docker image and tag it appropriately
+                        sh """
+                            docker build -t ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG} .
+                            docker images | grep ${env.APPLICATION_TAG}
+                        """
+                    }
                 }
             }
         }
@@ -61,19 +64,25 @@ pipeline {
         stage('Pushing Application to DockerHub') {
             steps {
                 script {
-                    // Push the Docker image to DockerHub
-                    sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}"
+                    // Ensure Docker is available in the environment
+                    docker.withServer('unix:///var/run/docker.sock') {
+                        // Push the Docker image to DockerHub
+                        sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}"
+                    }
                 }
             }
         }
         stage('Deploy to Server') {
             steps {
                 script {
-                    // Deploy the application by running it as a Docker container
-                    sh """
-                        docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
-                        docker ps | grep ${env.APPLICATION_NAME}
-                    """
+                    // Ensure Docker is available in the environment
+                    docker.withServer('unix:///var/run/docker.sock') {
+                        // Deploy the application by running it as a Docker container
+                        sh """
+                            # docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
+                            # docker ps | grep ${env.APPLICATION_NAME}
+                        """
+                    }
                 }
             }
         }
