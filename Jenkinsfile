@@ -1,17 +1,29 @@
 pipeline {
     agent any
     environment {
-        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials'
+        DOCKERHUB_CREDENTIALS = 'docker-login'
         SSH_CREDENTIALS = 'ssh-credentials'
-        GITHUB_CREDENTIALS = 'github-ssh-key'
+        GITHUB_CREDENTIALS = 'github-login'
         DOCKER_HUB_USERNAME = "olamyde"
         APPLICATION_NAME = "medication_search"
         APPLICATION_TAG = "latest"
+        SONARQUBE_SERVER = 'Sonerqube' // Define the SonarQube server name configured in Jenkins
+        SONARQUBE_PROJECT_KEY = 'MedicationApp' // Define the SonarQube project key
+        SONARQUBE_SCANNER = 'SonarQubeScanner' // Define the SonarQube Scanner tool name
     }
     stages {
         stage('Clone Repository') {
             steps {
                 git branch: 'main', url: 'git@github.com:olamyde/Medication_App.git', credentialsId: env.GITHUB_CREDENTIALS
+            }
+        }
+        stage('SonarQube Code Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv(env.SONARQUBE_SERVER) {
+                        sh "${env.SONARQUBE_SCANNER} -Dsonar.projectKey=${env.SONARQUBE_PROJECT_KEY} -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN}"
+                    }
+                }
             }
         }
         stage('Checking the code') {
@@ -55,8 +67,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker run -itd -p 5001:5000 --name medication_search ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
-                        docker ps |grep ${env.APPLICATION_NAME}
+                        # docker run -itd -p 5001:5000 --name medication_search ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
+                        # docker ps |grep ${env.APPLICATION_NAME}
                     """
                 }
             }
