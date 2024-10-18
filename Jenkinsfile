@@ -7,30 +7,35 @@ pipeline {
         DOCKER_HUB_USERNAME = "olamyde"
         APPLICATION_NAME = "medication_search"
         APPLICATION_TAG = "latest"
-        SONARQUBE_SERVER = 'Sonerqube' // Define the SonarQube server name configured in Jenkins
+        SONARQUBE_SERVER = 'SonarQube' // Define the SonarQube server name configured in Jenkins
         SONARQUBE_PROJECT_KEY = 'MedicationApp' // Define the SonarQube project key
         SONARQUBE_SCANNER = 'SonarQubeScanner' // Define the SonarQube Scanner tool name
     }
-    stage('SonarQube analysis') {
+    stages {
+        stage('SonarQube analysis') {
             agent {
                 docker {
-                  image 'sonarsource/sonar-scanner-cli:5.0.1'
+                    image 'sonarsource/sonar-scanner-cli:5.0.1'
+                    // Define the Docker agent to run SonarQube analysis
                 }
-               }
-               environment {
-        CI = 'true'
-        //  scannerHome = tool 'Sonar'
-        scannerHome='/opt/sonar-scanner'
-    }
-            steps{
-                withSonarQubeEnv('Sonar') {
-                    sh "${scannerHome}/bin/sonar-scanner"
+            }
+            environment {
+                CI = 'true'
+                scannerHome = '/opt/sonar-scanner' // Define the scanner's home directory
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=${env.SONARQUBE_PROJECT_KEY} \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=${env.SONARQUBE_SERVER}"
                 }
             }
         }
         stage('Checking the code') {
             steps {
                 script {
+                    // List the directory contents to verify the workspace
                     sh 'ls -l'
                 }
             }
@@ -38,6 +43,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image and tag it appropriately
                     sh """
                         docker build -t ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG} .
                         docker images | grep ${env.APPLICATION_TAG}
@@ -45,32 +51,31 @@ pipeline {
                 }
             }
         }
-        stage('Docker Login into') {
+        stage('Docker Login') {
             steps {
                 script {
-                    // Login to Docker Hub
+                    // Login to DockerHub using stored credentials
                     withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        // Use Docker CLI to login
                         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                     }
                 }
             }
         }
-        stage('Pushing Application into DockerHub') {
+        stage('Pushing Application to DockerHub') {
             steps {
                 script {
-                    sh """
-                        docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
-                    """
+                    // Push the Docker image to DockerHub
+                    sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}"
                 }
             }
         }
         stage('Deploy to Server') {
             steps {
                 script {
+                    // Deploy the application by running it as a Docker container
                     sh """
-                        # docker run -itd -p 5001:5000 --name medication_search ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
-                        # docker ps |grep ${env.APPLICATION_NAME}
+                        # docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
+                        # docker ps | grep ${env.APPLICATION_NAME}
                     """
                 }
             }
@@ -78,6 +83,8 @@ pipeline {
     }
     post {
         always {
+            // Clean the workspace after each build
             cleanWs()
         }
     }
+}
