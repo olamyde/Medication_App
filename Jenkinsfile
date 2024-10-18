@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'git@github.com:olamyde/Medication_App.git', credentialsId: env.GITHUB_CREDENTIALS
+                git branch: 'main', url: 'git@github.com:olamyde/Medication_App.git'
             }
         }
         stage('SonarQube Code Analysis') {
