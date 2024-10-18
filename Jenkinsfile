@@ -13,22 +13,19 @@ pipeline {
     }
     stages {
         stage('SonarQube analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:5.0.1'
-                    // Define the Docker agent to run SonarQube analysis
-                }
-            }
-            environment {
-                CI = 'true'
-                scannerHome = '/opt/sonar-scanner' // Define the scanner's home directory
-            }
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=${env.SONARQUBE_PROJECT_KEY} \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=${env.SONARQUBE_SERVER}"
+                script {
+                    // Pull and run the SonarQube scanner Docker image
+                    docker.image('sonarsource/sonar-scanner-cli:5.0.1').inside {
+                        withSonarQubeEnv('SonarQube') {
+                            sh """
+                                sonar-scanner \
+                                -Dsonar.projectKey=${env.SONARQUBE_PROJECT_KEY} \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=${env.SONARQUBE_SERVER}
+                            """
+                        }
+                    }
                 }
             }
         }
@@ -74,8 +71,8 @@ pipeline {
                 script {
                     // Deploy the application by running it as a Docker container
                     sh """
-                        # docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
-                        # docker ps | grep ${env.APPLICATION_NAME}
+                        docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
+                        docker ps | grep ${env.APPLICATION_NAME}
                     """
                 }
             }
