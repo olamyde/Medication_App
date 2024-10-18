@@ -7,47 +7,21 @@ pipeline {
         DOCKER_HUB_USERNAME = "olamyde"
         APPLICATION_NAME = "medication_search"
         APPLICATION_TAG = "latest"
-        SONARQUBE_SERVER = 'SonarQube' // Define the SonarQube server name configured in Jenkins
-        SONARQUBE_PROJECT_KEY = 'MedicationApp' // Define the SonarQube project key
-        SONARQUBE_SCANNER = 'SonarQubeScanner' // Define the SonarQube Scanner tool name
     }
     stages {
-        stage('SonarQube analysis') {
-            steps {
-                script {
-                    // Pull and run the SonarQube scanner Docker image
-                    docker.image('sonarsource/sonar-scanner-cli:5.0.1').inside {
-                        withSonarQubeEnv('SonarQube') {
-                            sh """
-                                sonar-scanner \
-                                -Dsonar.projectKey=${env.SONARQUBE_PROJECT_KEY} \
-                                -Dsonar.sources=. \
-                                -Dsonar.host.url=${env.SONARQUBE_SERVER}
-                            """
-                        }
-                    }
+stage('SonarQube analysis') {
+            agent {
+                docker {
+                  image 'sonarsource/sonar-scanner-cli:5.0.1'
                 }
-            }
-        }
-        stage('Checking the code') {
-            steps {
-                script {
-                    // List the directory contents to verify the workspace
-                    sh 'ls -l'
-                }
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // Ensure Docker is available in the environment
-                    docker.withServer('unix:///var/run/docker.sock') {
-                        // Build the Docker image and tag it appropriately
-                        sh """
-                            docker build -t ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG} .
-                            docker images | grep ${env.APPLICATION_TAG}
-                        """
-                    }
+               }
+               environment {
+        CI = 'true'
+        scannerHome='/opt/sonar-scanner'
+    }
+            steps{
+                withSonarQubeEnv('Sonar') {
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
@@ -61,17 +35,24 @@ pipeline {
                 }
             }
         }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                        sh """
+                            docker build -t ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG} .
+                            docker images | grep ${env.APPLICATION_TAG}
+                        """
+                    }
+                }
+            }
         stage('Pushing Application to DockerHub') {
             steps {
                 script {
-                    // Ensure Docker is available in the environment
-                    docker.withServer('unix:///var/run/docker.sock') {
                         // Push the Docker image to DockerHub
                         sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}"
                     }
                 }
             }
-        }
         stage('Deploy to Server') {
             steps {
                 script {
