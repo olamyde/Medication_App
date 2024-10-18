@@ -9,7 +9,7 @@ pipeline {
         APPLICATION_TAG = "latest"
     }
     stages {
-stage('SonarQube analysis') {
+        stage('SonarQube analysis') {
             agent {
                 docker {
                   image 'sonarsource/sonar-scanner-cli:5.0.1'
