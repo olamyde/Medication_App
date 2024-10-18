@@ -12,11 +12,6 @@ pipeline {
         SONARQUBE_SCANNER = 'SonarQubeScanner' // Define the SonarQube Scanner tool name
     }
     stages {
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main', url: 'git@github.com:olamyde/Medication_App.git'
-            }
-        }
         stage('SonarQube Code Analysis') {
             steps {
                 script {
