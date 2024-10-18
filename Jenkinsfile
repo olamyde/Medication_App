@@ -11,13 +11,20 @@ pipeline {
         SONARQUBE_PROJECT_KEY = 'MedicationApp' // Define the SonarQube project key
         SONARQUBE_SCANNER = 'SonarQubeScanner' // Define the SonarQube Scanner tool name
     }
-    stages {
-        stage('SonarQube Code Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv(env.SONARQUBE_SERVER) {
-                        sh "${env.SONARQUBE_SCANNER} -Dsonar.projectKey=${env.SONARQUBE_PROJECT_KEY} -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN}"
-                    }
+    stage('SonarQube analysis') {
+            agent {
+                docker {
+                  image 'sonarsource/sonar-scanner-cli:5.0.1'
+                }
+               }
+               environment {
+        CI = 'true'
+        //  scannerHome = tool 'Sonar'
+        scannerHome='/opt/sonar-scanner'
+    }
+            steps{
+                withSonarQubeEnv('Sonar') {
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
