@@ -12,6 +12,7 @@ pipeline {
         stage('SonarQube analysis') {
             agent {
                 docker {
+                  args '-v /var/run/docker.sock:/var/run/docker.sock'
                   image 'sonarsource/sonar-scanner-cli:5.0.1'
                 }
                }
