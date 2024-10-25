@@ -8,6 +8,12 @@ pipeline {
         APPLICATION_NAME = "medication_search"
         APPLICATION_TAG = "latest"
     }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+        timeout (time: 60, unit: 'MINUTES')
+        timestamps()
+      }
     stages {
         stage('SonarQube Analysis') {
             agent {
