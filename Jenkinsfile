@@ -9,7 +9,16 @@ pipeline {
         APPLICATION_TAG = "latest"
     }
     stages {
-        stage('SonarQube analysis') {
+        stage('Checkout Code') {
+            steps {
+                script {
+                    // Checking out the code from the Git repository
+                    checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/olamyde/Medication_App.git', credentialsId: env.GITHUB_CREDENTIALS]]])
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
             agent {
                 docker {
                     image 'sonarsource/sonar-scanner-cli:5.0.1'
@@ -48,7 +57,7 @@ pipeline {
             }
         }
         
-        stage('Pushing Application to DockerHub') {
+        stage('Push Application to DockerHub') {
             steps {
                 script {
                     // Push the Docker image to DockerHub
