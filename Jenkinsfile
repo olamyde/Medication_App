@@ -9,6 +9,11 @@ pipeline {
         APPLICATION_TAG = "latest"
     }
     stages {
+        stage('Checkout') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/olamyde/Medication_App.git']]])
+      }
+    }
         stage('SonarQube analysis') {
             agent {
                 docker {
