@@ -1,4 +1,4 @@
-pipeline {
+pipeline { 
     agent any
     environment {
         DOCKERHUB_CREDENTIALS = 'docker-login'
@@ -9,27 +9,23 @@ pipeline {
         APPLICATION_TAG = "latest"
     }
     stages {
-        stage('Checkout') {
-      steps {
-        checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/olamyde/Medication_App.git']]])
-      }
-    }
         stage('SonarQube analysis') {
             agent {
                 docker {
-                  image 'sonarsource/sonar-scanner-cli:5.0.1'
+                    image 'sonarsource/sonar-scanner-cli:5.0.1'
                 }
-               }
-               environment {
-        CI = 'true'
-        scannerHome='/opt/sonar-scanner'
-    }
-            steps{
+            }
+            environment {
+                CI = 'true'
+                scannerHome = '/opt/sonar-scanner'
+            }
+            steps {
                 withSonarQubeEnv('Sonar') {
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
+        
         stage('Docker Login') {
             steps {
                 script {
@@ -40,39 +36,40 @@ pipeline {
                 }
             }
         }
+        
         stage('Build Docker Image') {
             steps {
                 script {
-                        sh """
-                            docker build -t ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG} .
-                            docker images | grep ${env.APPLICATION_TAG}
-                        """
-                    }
+                    sh """
+                        docker build -t ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG} .
+                        docker images | grep ${env.APPLICATION_TAG}
+                    """
                 }
             }
+        }
+        
         stage('Pushing Application to DockerHub') {
             steps {
                 script {
-                        // Push the Docker image to DockerHub
-                        sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}"
-                    }
+                    // Push the Docker image to DockerHub
+                    sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}"
                 }
             }
+        }
+        
         stage('Deploy to Server') {
             steps {
                 script {
-                    // Ensure Docker is available in the environment
-                    docker.withServer('unix:///var/run/docker.sock') {
-                        // Deploy the application by running it as a Docker container
-                        sh """
-                            # docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
-                            # docker ps | grep ${env.APPLICATION_NAME}
-                        """
-                    }
+                    // Deploy the application by running it as a Docker container
+                    sh """
+                        docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
+                        docker ps | grep ${env.APPLICATION_NAME}
+                    """
                 }
             }
         }
     }
+    
     post {
         always {
             // Clean the workspace after each build
