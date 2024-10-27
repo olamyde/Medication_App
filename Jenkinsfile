@@ -3,7 +3,7 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = 'Docker-login'
         SSH_CREDENTIALS = 'ssh-credentials'
-        GITHUB_CREDENTIALS = 'github-ssh'
+        GITHUB_CREDENTIALS = 'Github-ssh'
         DOCKER_HUB_USERNAME = "olamyde"
         APPLICATION_NAME = "medication_search"
         APPLICATION_TAG = "latest"
@@ -11,14 +11,15 @@ pipeline {
     options {
         buildDiscarder(logRotator(numToKeepStr: '20'))
         disableConcurrentBuilds()
-        timeout (time: 60, unit: 'MINUTES')
+        timeout(time: 60, unit: 'MINUTES')
         timestamps()
-      }
+    }
     stages {
         stage('SonarQube Analysis') {
             agent {
                 docker {
                     image 'sonarsource/sonar-scanner-cli:5.0.1'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock' // Add Docker socket if needed for nested Docker usage
                 }
             }
             environment {
@@ -35,7 +36,6 @@ pipeline {
         stage('Docker Login') {
             steps {
                 script {
-                    // Login to DockerHub using stored credentials
                     withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                     }
@@ -57,7 +57,6 @@ pipeline {
         stage('Push Application to DockerHub') {
             steps {
                 script {
-                    // Push the Docker image to DockerHub
                     sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}"
                 }
             }
@@ -66,7 +65,6 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
-                    // Deploy the application by running it as a Docker container
                     sh """
                         docker run -itd -p 5001:5000 --name ${env.APPLICATION_NAME} ${env.DOCKER_HUB_USERNAME}/${env.APPLICATION_NAME}:${env.APPLICATION_TAG}
                         docker ps | grep ${env.APPLICATION_NAME}
@@ -78,7 +76,6 @@ pipeline {
     
     post {
         always {
-            // Clean the workspace after each build
             cleanWs()
         }
     }
