@@ -19,7 +19,7 @@ pipeline {
             agent {
                 docker {
                     image 'python:latest'
-                    label 'docker-agent'
+                    // label 'docker-agent'
                 }
             }
             steps {
