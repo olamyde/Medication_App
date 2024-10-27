@@ -21,22 +21,25 @@ pipeline {
                     image 'python:latest'
                     label 'docker-agent'
                 }
+            }
             steps {
-                sh'''
+                sh '''
                     cd ${WORKSPACE}
                     pip test 
                 '''
-                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             agent {
                 docker {
-                  image 'sonarsource/sonar-scanner-cli:5.0.1'
+                    image 'sonarsource/sonar-scanner-cli:5.0.1'
                 }
-               }
-               environment {
-        CI = 'true'
-        scannerHome='/opt/sonar-scanner'
-                }
+            }
+            environment {
+                CI = 'true'
+                scannerHome = '/opt/sonar-scanner'
+            }
             steps {
                 withSonarQubeEnv('Sonarqube') {
                     sh "${scannerHome}/bin/sonar-scanner"
@@ -84,11 +87,9 @@ pipeline {
             }
         }
     }
-}
     post {
         always {
             cleanWs()
         }
     }
-}
 }
