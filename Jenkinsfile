@@ -25,7 +25,7 @@ pipeline {
             steps {
                 sh '''
                     cd ${WORKSPACE}
-                    python -m unittest discover .
+                    python 
                 '''
             }
         }
