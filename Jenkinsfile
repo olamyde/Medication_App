@@ -1,7 +1,7 @@
 pipeline { 
     agent any
     environment {
-        DOCKERHUB_CREDENTIALS = 'docker-login'
+        DOCKERHUB_CREDENTIALS = 'Docker-login'
         SSH_CREDENTIALS = 'ssh-credentials'
         GITHUB_CREDENTIALS = 'github-ssh'
         DOCKER_HUB_USERNAME = "olamyde"
