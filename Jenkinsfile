@@ -16,16 +16,6 @@ pipeline {
     }
     stages {
         stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:5.0.1'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock' // Add Docker socket if needed for nested Docker usage
-                }
-            }
-            environment {
-                CI = 'true'
-                scannerHome = '/opt/sonar-scanner'
-            }
             steps {
                 withSonarQubeEnv('Sonar') {
                     sh "${scannerHome}/bin/sonar-scanner"
