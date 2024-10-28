@@ -42,7 +42,7 @@ pipeline {
             }
             steps {
                 withSonarQubeEnv('Sonarqube') {
-                    sh "${scannerHome}/bin/sonar-scanner"
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.host.url=http://192.168.49.2:32498"
                 }
             }
         }
