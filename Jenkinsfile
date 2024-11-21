@@ -38,11 +38,11 @@ pipeline {
             }
             environment {
                 CI = 'true'
-                scannerHome = '/opt/sonarqube'
+                scannerHome = '/opt/sonarqube/bin'
             }
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.host.url=http://172.20.2.221:9000/"
+                    sh "${scannerHome}/sonar-scanner -Dsonar.host.url=http://172.20.2.221:9000/"
                 }
             }
         }
