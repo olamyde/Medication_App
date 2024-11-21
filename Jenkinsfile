@@ -31,19 +31,11 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:5.0.1'
-                }
-            }
-            environment {
-                CI = 'true'
-                scannerHome = '/opt/sonarqube/sonar-scanner-5.0.1.3006/bin/sonar-scanner'
-            }
             steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh "${scannerHome} -Dsonar.projectKey=Medication_App -Dsonar.host.url=http://172.20.2.221:9000/"
-                }
+                sh '''
+                export PATH=$PATH:/opt/sonarqube/sonar-scanner-5.0.1.3006/bin
+                sonar-scanner -Dsonar.projectKey=Medication_App -Dsonar.host.url=http://172.20.2.221:9000/
+                '''
             }
         }
         
