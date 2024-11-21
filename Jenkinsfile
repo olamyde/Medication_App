@@ -38,11 +38,11 @@ pipeline {
             }
             environment {
                 CI = 'true'
-                scannerHome = '/opt/sonarqube/bin'
+                scannerHome = '/opt/sonarqube'
             }
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh "${scannerHome}/sonar-scanner-5.0.1.3006-linux -Dsonar.projectKey=Medication_App -Dsonar.host.url=http://172.20.2.221:9000/"
+                    sh "${scannerHome}/sonar-scanner -Dsonar.projectKey=Medication_App -Dsonar.host.url=http://172.20.2.221:9000/"
                 }
             }
         }
