@@ -32,13 +32,14 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                withSonarQubeEnv('sonarqube') {
                 sh '''
                 export PATH=$PATH:/opt/sonarqube/sonar-scanner-5.0.1.3006/bin
                 sonar-scanner -Dsonar.projectKey=Medication_App -Dsonar.host.url=http://172.20.2.221:9000/
                 '''
             }
         }
-        
+    }   
         stage('Docker Login') {
             steps {
                 script {
